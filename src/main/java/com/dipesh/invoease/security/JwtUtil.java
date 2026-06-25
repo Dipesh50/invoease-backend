@@ -1,6 +1,7 @@
 package com.dipesh.invoease.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -61,7 +62,7 @@ public class JwtUtil {
         try {
             Claims claims = extractClaims(token);
             return claims.getExpiration().after(new Date());
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
