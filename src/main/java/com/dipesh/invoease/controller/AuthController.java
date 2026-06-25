@@ -1,6 +1,8 @@
 package com.dipesh.invoease.controller;
 
+import com.dipesh.invoease.dto.request.LoginRequest;
 import com.dipesh.invoease.dto.request.SignupRequest;
+import com.dipesh.invoease.dto.response.AuthResponse;
 import com.dipesh.invoease.entity.User;
 import com.dipesh.invoease.service.AuthService;
 import jakarta.validation.Valid;
@@ -24,5 +26,9 @@ public class AuthController {
                 "userId", user.getId(),
                 "tenantId", user.getTenant().getId()
         ));
+    }
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 }

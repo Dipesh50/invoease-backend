@@ -1,10 +1,13 @@
 package com.dipesh.invoease.service;
 
+import com.dipesh.invoease.dto.request.LoginRequest;
 import com.dipesh.invoease.dto.request.SignupRequest;
+import com.dipesh.invoease.dto.response.AuthResponse;
 import com.dipesh.invoease.entity.Tenant;
 import com.dipesh.invoease.entity.User;
 import com.dipesh.invoease.repository.TenantRepository;
 import com.dipesh.invoease.repository.UserRepository;
+import com.dipesh.invoease.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,5 +39,19 @@ public class AuthService {
         user.setRole(User.Role.OWNER);
 
         return userRepository.save(user);
+    }
+    private final JwtUtil jwtUtil;
+
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+
+        String token = jwtUtil.generateToken(user.getId(), user.getTenant().getId(), user.getRole().name());
+
+        return new AuthResponse(token, "Bearer", user.getId(), user.getTenant().getId(), user.getRole().name());
     }
 }
